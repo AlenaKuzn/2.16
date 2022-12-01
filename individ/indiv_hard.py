@@ -102,9 +102,36 @@ def load_reys(file_name):
     """
     Загрузить всех работников из файла JSON.
     """
-    # Открыть файл с заданным именем для чтения.
+    schema = {
+        "type": "array",
+        "items": [
+            {
+                "type": "object",
+                "reys": {
+                    "pynkt": {
+                        "type": "string"
+                    },
+                    "numb": {
+                        "type": "integer"
+                    },
+                    "samolet": {
+                        "type": "string"
+                    }
+                },
+                "required": ["pynkt", "numb", "samolet"]
+            }
+        ]
+    }
     with open(file_name, "r", encoding="utf-8") as fin:
-        return json.load(fin)
+        file = json.load(fin)
+        validator = jsonschema.Draft7Validator(schema)
+        try:
+            if not validator.validate(file):
+                print("Валидация прошла успешно.")
+        except jsonschema.exceptions.ValidationError:
+            print("Ошибка. Проверьте файл.", list(validator.iter_errors(file)))
+            exit()
+    return file
 
 
 def main():
